@@ -4,24 +4,39 @@ function get_title() {
     return title;
 }
 
-function get_description_box() {
-    return document.getElementsByClassName("content style-scope ytd-video-secondary-info-renderer")[0];
-}
-
 function create_description_element(text) {
     let element = document.createElement("span");
-    element.className = "style-scope yt-formatted-string";
-    element.dir = "auto";
     element.innerHTML = "\n" + text;
     return element;
 }
 
+function prepare_description() {
+    let description_div = document.getElementById("description");
+    let new_div = document.createElement("div");
+    new_div.id = "lyrics";
+    description_div.insertAdjacentElement("afterend", new_div);
+    return new_div;
+}
+
+function delete_previous_lyrics() {
+    let element = document.getElementById("lyrics");
+    if (element) {
+        element.remove();
+    }
+}
+
 function add_lyrics(text) {
-    let description_box = get_description_box();
-    let credits = create_description_element("\nYTLyrics Version 0.1")
-    description_box.appendChild(credits);
-    let description_element = create_description_element(text);
-    description_box.appendChild(description_element);
+    try {
+        delete_previous_lyrics();
+        let description_box = prepare_description();
+        let credits = create_description_element("\nYTLyrics Version 0.1")
+        description_box.appendChild(credits);
+        let description_element = create_description_element(text);
+        description_box.appendChild(description_element);
+    }
+    catch (e) {
+        console.log(e);
+    }
 }
 
 function initialize_genius() {
@@ -59,8 +74,8 @@ async function get_lyrics(url) {
     let text = await response.text();
     let parser = new DOMParser();
     let wrapper = parser.parseFromString(text, "text/html");
-    let p_tags = wrapper.getElementsByTagName("p");
-    return p_tags[0].innerText;
+    let lyrics = wrapper.getElementsByClassName("lyrics")[0];
+    return lyrics.innerText;
 }
 
 function create_cookie(access_token) {
@@ -83,7 +98,7 @@ function get_cookie_value(cookies, key) {
     return null;
 }
 
-async function main() {
+function get_access_token() {
     let cookies = read_cookies();
     let access_token = get_cookie_value(cookies, "access_token");
     if (!access_token) {
@@ -95,20 +110,32 @@ async function main() {
             initialize_genius();
         }
     } 
-    else {
-        if (window.location.href.includes("watch?v=")) {
-            let title = get_title();
-            let json = await search(access_token, title);
-            if (!json) {
-                add_lyrics("Lyrics couldn't be found.");
-                return;
-            }
-            let url_path = json["response"]["hits"][0]["result"]["path"];
-            let full_path = "https://genius.com" + url_path;
-            let lyrics = await get_lyrics(full_path);
-            add_lyrics(lyrics);
+    return access_token;
+}
+
+async function main() {
+    let current_video = window.location.href;
+    if (current_video.includes("watch?v=")) {
+        if (previous_video == current_video) {
+            return;
         }
+        previous_video = current_video;
+        let title = get_title();
+        let json = await search(access_token, title);
+        if (!json) {
+            add_lyrics("Lyrics couldn't be found.");
+            return;
+        }
+        let url_path = json["response"]["hits"][0]["result"]["path"];
+        let full_path = "https://genius.com" + url_path;
+        console.log(full_path);
+        let lyrics = await get_lyrics(full_path);
+        console.log(lyrics);
+        add_lyrics(lyrics);
     }
 }
 
-setTimeout(main, 5000);
+var previous_video = "";
+var access_token = get_access_token();
+console.log(access_token);
+setInterval(main, 5000);
