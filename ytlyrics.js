@@ -1,3 +1,56 @@
+function initialize_genius() {
+    let url = new URL("https://api.genius.com/oauth/authorize");
+    let options = {
+            "client_id": "4w_T6z86ikWmWAL4VCgvfUKJfQDWYTqVvGt-q1bBywqpM9BzLFYQFiLxZAwwYnJT", 
+            "scope": "me create_annotation",
+            "response_type": "token",
+            "state": ""
+    }
+    for (e in options) {
+        url.searchParams.append(e, options[e]);
+    }
+    window.location = url.href;
+}
+
+function create_cookie(access_token) {
+    document.cookie = "access_token=" + access_token;
+}
+
+function read_cookies() {
+    return document.cookie;
+}
+
+function get_cookie_value(cookies, key) {
+    let split_cookies = cookies.split("; ");
+    for (i in split_cookies) {
+        let cookie = split_cookies[i].split("=");
+        let cookie_key = cookie[0];
+        if (cookie_key == key) {
+            return cookie[1];
+        }
+    }
+    return null;
+}
+
+function extract_access_token(url) {
+    return url.split("&")[0].substring(14);
+}
+
+function get_access_token() {
+    let cookies = read_cookies();
+    let access_token = get_cookie_value(cookies, "access_token");
+    if (!access_token) {
+        if (window.location.hash) {
+            let access_token = extract_access_token(window.location.hash.toString());
+            create_cookie(access_token);
+        }
+        else {
+            initialize_genius();
+        }
+    } 
+    return access_token;
+}
+
 function filter_title(title) {
     let forbidden = ["[", "("];
     let char;
@@ -47,24 +100,6 @@ function add_lyrics(text) {
     description_box.appendChild(description_element);
 }
 
-function initialize_genius() {
-    let url = new URL("https://api.genius.com/oauth/authorize");
-    let options = {
-            "client_id": "4w_T6z86ikWmWAL4VCgvfUKJfQDWYTqVvGt-q1bBywqpM9BzLFYQFiLxZAwwYnJT", 
-            "scope": "me create_annotation",
-            "response_type": "token",
-            "state": ""
-    }
-    for (e in options) {
-        url.searchParams.append(e, options[e]);
-    }
-    window.location = url.href;
-}
-
-function extract_access_token(url) {
-    return url.split("&")[0].substring(14);
-}
-
 async function search(access_token, query) {
     console.log(query);
     let response = await fetch("https://api.genius.com/search?q=" + query, {
@@ -84,41 +119,6 @@ async function get_lyrics(url) {
     let wrapper = parser.parseFromString(text, "text/html");
     let lyrics = wrapper.getElementsByClassName("lyrics")[0];
     return lyrics.innerText;
-}
-
-function create_cookie(access_token) {
-    document.cookie = "access_token=" + access_token;
-}
-
-function read_cookies() {
-    return document.cookie;
-}
-
-function get_cookie_value(cookies, key) {
-    let split_cookies = cookies.split("; ");
-    for (i in split_cookies) {
-        let cookie = split_cookies[i].split("=");
-        let cookie_key = cookie[0];
-        if (cookie_key == key) {
-            return cookie[1];
-        }
-    }
-    return null;
-}
-
-function get_access_token() {
-    let cookies = read_cookies();
-    let access_token = get_cookie_value(cookies, "access_token");
-    if (!access_token) {
-        if (window.location.hash) {
-            let access_token = extract_access_token(window.location.hash.toString());
-            create_cookie(access_token);
-        }
-        else {
-            initialize_genius();
-        }
-    } 
-    return access_token;
 }
 
 async function main() {
