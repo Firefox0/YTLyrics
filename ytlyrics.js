@@ -6,7 +6,7 @@ function get_title() {
 
 function create_description_element(text) {
     let element = document.createElement("span");
-    element.innerHTML = "\n" + text;
+    element.innerText = "\n" + text;
     return element;
 }
 
@@ -26,17 +26,12 @@ function delete_previous_lyrics() {
 }
 
 function add_lyrics(text) {
-    try {
-        delete_previous_lyrics();
-        let description_box = prepare_description();
-        let credits = create_description_element("\nYTLyrics Version 0.1")
-        description_box.appendChild(credits);
-        let description_element = create_description_element(text);
-        description_box.appendChild(description_element);
-    }
-    catch (e) {
-        console.log(e);
-    }
+    delete_previous_lyrics();
+    let description_box = prepare_description();
+    let credits = create_description_element("\nYTLyrics Version 0.1")
+    description_box.appendChild(credits);
+    let description_element = create_description_element(text);
+    description_box.appendChild(description_element);
 }
 
 function initialize_genius() {
@@ -128,14 +123,11 @@ async function main() {
         }
         let url_path = json["response"]["hits"][0]["result"]["path"];
         let full_path = "https://genius.com" + url_path;
-        console.log(full_path);
         let lyrics = await get_lyrics(full_path);
-        console.log(lyrics);
         add_lyrics(lyrics);
     }
 }
 
 var previous_video = "";
 var access_token = get_access_token();
-console.log(access_token);
 setInterval(main, 5000);
