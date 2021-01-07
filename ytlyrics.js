@@ -83,29 +83,32 @@ function get_cookie_value(cookies, key) {
     return null;
 }
 
-async function init() {
+async function main() {
     let cookies = read_cookies();
     let access_token = get_cookie_value(cookies, "access_token");
-    if (!access_token && window.location.hash) {
-        let access_token = extract_access_token(window.location.hash.toString());
-        create_cookie(access_token);
-    } 
-    if (access_token && window.location.href.includes("watch?v=")) {
-        let title = get_title();
-        let json = await search(access_token, title);
-        if (!json) {
-            add_lyrics("Lyrics couldn't be found.");
-            return;
+    if (!access_token) {
+        if (window.location.hash) {
+            let access_token = extract_access_token(window.location.hash.toString());
+            create_cookie(access_token);
         }
-        let url_path = json["response"]["hits"][0]["result"]["path"];
-        let full_path = "https://genius.com" + url_path;
-        let lyrics = await get_lyrics(full_path);
-        console.log(lyrics);
-        add_lyrics(lyrics);
-    }
+        else {
+            initialize_genius();
+        }
+    } 
     else {
-        initialize_genius();
+        if (window.location.href.includes("watch?v=")) {
+            let title = get_title();
+            let json = await search(access_token, title);
+            if (!json) {
+                add_lyrics("Lyrics couldn't be found.");
+                return;
+            }
+            let url_path = json["response"]["hits"][0]["result"]["path"];
+            let full_path = "https://genius.com" + url_path;
+            let lyrics = await get_lyrics(full_path);
+            add_lyrics(lyrics);
+        }
     }
 }
 
-setTimeout(init, 2000);
+setTimeout(main, 2000);
