@@ -1,6 +1,19 @@
+function filter_title(title) {
+    let forbidden = ["[", "("];
+    let char;
+    for (i in forbidden) {
+        char = forbidden[i];
+        if (title.includes(char)) {
+            return title.split(char)[0];
+        }
+    }
+    return title;
+}
+
 function get_title() {
     let elements = document.getElementsByClassName("title style-scope ytd-video-primary-info-renderer");
-    let title = elements[0].firstChild.innerText;
+    let full_title = elements[0].firstChild.innerText;
+    let title = filter_title(full_title);
     return title;
 }
 
