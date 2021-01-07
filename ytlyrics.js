@@ -111,4 +111,4 @@ async function main() {
     }
 }
 
-setTimeout(main, 2000);
+setTimeout(main, 5000);
