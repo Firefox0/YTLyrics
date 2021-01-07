@@ -65,8 +65,7 @@ function filter_title(title) {
 
 function get_title() {
     let elements = document.getElementsByClassName("title style-scope ytd-video-primary-info-renderer");
-    let full_title = elements[0].firstChild.innerText;
-    let title = filter_title(full_title);
+    let title = elements[0].firstChild.innerText;
     return title;
 }
 
@@ -124,11 +123,13 @@ async function get_lyrics(url) {
 async function main() {
     let current_video = window.location.href;
     if (current_video.includes("watch?v=")) {
-        if (previous_video == current_video) {
+        let full_title = get_title();
+        if (previous_title == full_title) {
+            console.log("I know this video already");
             return;
         }
-        previous_video = current_video;
-        let title = get_title();
+        previous_title = full_title;
+        let title = filter_title(full_title);
         let json = await search(access_token, title);
         if (!json) {
             add_lyrics("Lyrics couldn't be found.");
@@ -141,6 +142,6 @@ async function main() {
     }
 }
 
-var previous_video = "";
+var previous_title = "";
 var access_token = get_access_token();
-setInterval(main, 5000);
+setInterval(main, 1000);
