@@ -91,7 +91,6 @@ function delete_previous_lyrics() {
 }
 
 function add_lyrics(text) {
-    delete_previous_lyrics();
     let description_box = prepare_description();
     let credits = create_description_element("\nYTLyrics Version 0.1")
     description_box.appendChild(credits);
@@ -100,7 +99,6 @@ function add_lyrics(text) {
 }
 
 async function search(access_token, query) {
-    console.log(query);
     let response = await fetch("https://api.genius.com/search?q=" + query, {
         headers: {"Authorization": "Bearer " + access_token}
     });
@@ -125,10 +123,10 @@ async function main() {
     if (current_video.includes("watch?v=")) {
         let full_title = get_title();
         if (previous_title == full_title) {
-            console.log("I know this video already");
             return;
         }
         previous_title = full_title;
+        delete_previous_lyrics();
         let title = filter_title(full_title);
         let json = await search(access_token, title);
         if (!json) {
