@@ -118,9 +118,12 @@ async function get_lyrics(url) {
     return lyrics.innerText;
 }
 
+function watching() {
+    return window.location.href.includes("watch?v=");
+}
+
 async function main() {
-    let current_video = window.location.href;
-    if (current_video.includes("watch?v=")) {
+    if (watching()) {
         let full_title = get_title();
         if (previous_title == full_title) {
             return;
