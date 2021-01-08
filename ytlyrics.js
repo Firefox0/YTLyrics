@@ -83,7 +83,7 @@ function prepare_description() {
 }
 
 function delete_previous_lyrics() {
-    status.innerText = "";
+    source.innerText = "";
     lyrics_element.innerText = "";
 }
 
@@ -120,7 +120,7 @@ function init() {
     if (watching()) {
         let description = prepare_description();
         let elements = [
-            script_name, status, wrong_lyrics, input, button, seperator, lyrics_element
+            script_name, hint, input, button, seperator, song, source, lyrics_element
         ];
         for (i in elements) {
             description.appendChild(elements[i]);
@@ -132,22 +132,23 @@ function init() {
 async function update(full_title) {
     delete_previous_lyrics();
 
-    status.innerText = "Loading...";
-    status.removeAttribute("href");
+    song.innerText = "Loading...";
 
     let title = filter_title(full_title);
     let json = await search(access_token, title);
     if (!json) {
-        status.innerText = "Lyrics not found."; 
-        status.removeAttribute("href");
+        song.innerText = "Lyrics not found."; 
         return;
     }
 
-    let url_path = json["response"]["hits"][0]["result"]["path"];
-    let full_path = "https://genius.com" + url_path;
+    let song_title  = json["response"]["hits"][0]["result"]["full_title"] + "\n"
+    song.innerText = song_title;
 
-    status.innerText = full_path;
-    status.href = full_path;
+    let url_path = json["response"]["hits"][0]["result"]["path"];
+    let full_path = "https://genius.com" + url_path + "\n";
+
+    source.innerText = full_path + "\n";
+    source.href = full_path;
 
     let lyrics = await get_lyrics(full_path);
     lyrics_element.innerText = lyrics;
@@ -167,12 +168,12 @@ async function main() {
 let previous_title = "";
 let access_token = get_access_token();
 
-let script_name = create_description_element("\nYTLyrics\n", "h3");
+let script_name = create_description_element("\nYTLyrics", "h3");
 
-let status = create_description_element("", "a");
-status.href = "";
+let source = create_description_element("", "a");
+source.href = "";
 
-let wrong_lyrics = create_description_element("Search:\n");
+let hint = create_description_element("Search:\n");
 
 let input = document.createElement("input");
 input.setAttribute("type", "input");
@@ -187,6 +188,8 @@ button.style.width = "80px";
 button.style.height = "25px";
 
 let seperator = create_description_element("\n");
+
+let song = create_description_element("");
 
 let lyrics_element = create_description_element("");
 
