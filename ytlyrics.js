@@ -89,10 +89,8 @@ function prepare_description() {
 }
 
 function delete_previous_lyrics() {
-    let element = document.getElementById("lyrics");
-    if (element) {
-        element.remove();
-    }
+    source.innerText = "";
+    lyrics_element.innerText = "";
 }
 
 async function search(access_token, query) {
@@ -120,24 +118,51 @@ function watching() {
 }
 
 async function click() {
-    let input = document.getElementById("query_input");
     let new_query = input.value;
-    let json = await search(access_token, new_query);
+    update(new_query);
+}
+
+function init() {
+    if (watching()) {
+        let description = prepare_description();
+        let elements = [
+            script_name, error, source, wrong_lyrics, input, button, seperator, lyrics_element
+        ];
+        console.log(script_name);
+        for (i in elements) {
+            description.appendChild(elements[i]);
+        }
+        clearInterval(init_interval);
+    }
+}
+
+async function update(full_title) {
+    delete_previous_lyrics();
+
+    let title = filter_title(full_title);
+    let json = await search(access_token, title);
     if (!json) {
-        document.getElementById("lyrics_error").innerText("Lyrics couldn't be found");
+        error.style.visibility = "visible";
         return;
     }
+    error.style.visibility = "hidden";
 
     let url_path = json["response"]["hits"][0]["result"]["path"];
     let full_path = "https://genius.com" + url_path;
-    let source = document.getElementById("lyrics_source");
     source.innerText = full_path;
     source.href = full_path;
 
+    wrong_lyrics.style.visibility = "visible";
+    input.style.visibility = "visible";
+    button.style.visiblity = "visible";
+
+    seperator.style.visiblity = "visible";
+
     let lyrics = await get_lyrics(full_path);
-    let lyrics_element = document.getElementById("lyrics_element");
     lyrics_element.innerText = lyrics;
 
+    input.style.visibility = "visible";
+    button.style.visibility = "visible";
 }
 
 async function main() {
@@ -147,54 +172,39 @@ async function main() {
             return;
         }
         previous_title = full_title;
-        delete_previous_lyrics();
-
-        let description = prepare_description();
-        add_element(description, "\n~ YTLyrics ~");
-
-        let title = filter_title(full_title);
-        let json = await search(access_token, title);
-        if (!json) {
-            let error = add_element(description, "Lyrics couldn't be found.");
-            error.id = "lyrics_error";
-            return;
-        }
-
-        let url_path = json["response"]["hits"][0]["result"]["path"];
-        let full_path = "https://genius.com" + url_path;
-        let source = add_element(description, full_path, "a");
-        source.id = "lyrics_source";
-        source.href = full_path;
-
-        add_element(description, "Wrong Lyrics?\n");
-
-        let input = document.createElement("input");
-        input.id = "query_input";
-        input.setAttribute("type", "input");
-        input.style.visibility = "hidden";
-        input.style.width = "200px";
-        description.appendChild(input);
-
-        let button = document.createElement("input");
-        button.setAttribute("type", "button");
-        button.setAttribute("value", "Submit");
-        button.onclick = click;
-        button.style.visibility = "hidden";
-        button.style.width = "100px";
-        button.style.height = "25px";
-        description.appendChild(button);
-
-        add_element(description, "");
-
-        let lyrics = await get_lyrics(full_path);
-        let lyrics_element = add_element(description, lyrics);
-        lyrics_element.id = "lyrics_element";
-
-        input.style.visibility = "visible";
-        button.style.visibility = "visible";
+        update(full_title);
     }
 }
 
-var previous_title = "";
-var access_token = get_access_token();
+let previous_title = "";
+let access_token = get_access_token();
+
+let script_name = create_description_element("\n~ YTLyrics ~");
+
+let error = create_description_element("Lyrics couldn't be found.");
+error.style.visiblity = "hidden";
+
+let source = create_description_element("", "a");
+source.href = "";
+
+let wrong_lyrics = create_description_element("Wrong Lyrics?\n");
+
+let input = document.createElement("input");
+input.setAttribute("type", "input");
+input.style.visibility = "hidden";
+input.style.width = "200px";
+
+let button = document.createElement("input");
+button.setAttribute("type", "button");
+button.setAttribute("value", "Submit");
+button.onclick = click;
+button.style.visibility = "hidden";
+button.style.width = "100px";
+button.style.height = "25px";
+
+let seperator = create_description_element("");
+
+let lyrics_element = create_description_element("");
+
 setInterval(main, 1000);
+let init_interval = setInterval(init, 1000);
