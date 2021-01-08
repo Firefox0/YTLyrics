@@ -89,7 +89,7 @@ function prepare_description() {
 }
 
 function delete_previous_lyrics() {
-    source.innerText = "";
+    status.innerText = "";
     lyrics_element.innerText = "";
 }
 
@@ -126,7 +126,7 @@ function init() {
     if (watching()) {
         let description = prepare_description();
         let elements = [
-            script_name, error, source, wrong_lyrics, input, button, seperator, lyrics_element
+            script_name, status, wrong_lyrics, input, button, seperator, lyrics_element
         ];
         console.log(script_name);
         for (i in elements) {
@@ -142,15 +142,16 @@ async function update(full_title) {
     let title = filter_title(full_title);
     let json = await search(access_token, title);
     if (!json) {
-        error.style.visibility = "visible";
+        status.innerText = "Lyrics not found."; 
+        status.removeAttribute("href");
         return;
     }
-    error.style.visibility = "hidden";
 
     let url_path = json["response"]["hits"][0]["result"]["path"];
     let full_path = "https://genius.com" + url_path;
-    source.innerText = full_path;
-    source.href = full_path;
+
+    status.innerText = full_path;
+    status.href = full_path;
 
     let lyrics = await get_lyrics(full_path);
     lyrics_element.innerText = lyrics;
@@ -170,13 +171,10 @@ async function main() {
 let previous_title = "";
 let access_token = get_access_token();
 
-let script_name = create_description_element("\n~ YTLyrics ~");
+let script_name = create_description_element("\nYTLyrics\n");
 
-let error = create_description_element("Lyrics couldn't be found.");
-error.style.visiblity = "hidden";
-
-let source = create_description_element("", "a");
-source.href = "";
+let status = create_description_element("", "a");
+status.href = "";
 
 let wrong_lyrics = create_description_element("Wrong Lyrics?\n");
 
