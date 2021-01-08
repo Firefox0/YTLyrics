@@ -68,13 +68,13 @@ function get_title() {
     return elements[0].firstChild.innerText;
 }
 
-function create_description_element(text="", type="span") {
+function create_description_element(text, type="span") {
     let element = document.createElement(type);
     element.innerText = "\n" + text;
     return element;
 }
 
-function add_element(description, text="", type="span") {
+function add_element(description, text, type="span") {
     let element = create_description_element(text, type);
     description.appendChild(element);
     return element;
@@ -119,6 +119,11 @@ function watching() {
     return window.location.href.includes("watch?v=");
 }
 
+function click() {
+    let input = document.getElementById("query_input");
+    let new_query = input.value;
+}
+
 async function main() {
     if (watching()) {
         let full_title = get_title();
@@ -143,10 +148,30 @@ async function main() {
         let source = add_element(description, full_path, "a");
         source.href = full_path;
 
-        add_element(description);
+        add_element(description, "Wrong Lyrics?\n");
+
+        let input = document.createElement("input");
+        input.id = "query_input";
+        input.setAttribute("type", "input");
+        input.style.visibility = "hidden";
+        input.style.width = "200px";
+        description.appendChild(input);
+
+        let button = document.createElement("input");
+        button.setAttribute("type", "button");
+        button.setAttribute("value", "Submit");
+        button.onclick = click;
+        button.style.visibility = "hidden";
+        button.style.width = "100px";
+        description.appendChild(button);
+
+        add_element(description, "");
 
         let lyrics = await get_lyrics(full_path);
         add_element(description, lyrics);
+
+        input.style.visibility = "visible";
+        button.style.visibility = "visible";
     }
 }
 
