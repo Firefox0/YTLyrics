@@ -188,7 +188,7 @@ button.onclick = click;
 button.style.width = "100px";
 button.style.height = "25px";
 
-let seperator = create_description_element("");
+let seperator = create_description_element("\n");
 
 let lyrics_element = create_description_element("");
 
