@@ -154,6 +154,7 @@ async function update(full_title) {
     let top_result = json["response"]["hits"][0]["result"];
     let genius_title  = top_result["full_title"] + "\n"
     song.innerText = genius_title;
+    lyrics_element.innerText = "Loading...";
     let url_path = top_result["path"];
     let full_path = "https://genius.com" + url_path + "\n";
     source.innerText = full_path + "\n";
