@@ -69,9 +69,15 @@ function get_title() {
     return title;
 }
 
-function create_description_element(text) {
-    let element = document.createElement("span");
+function create_description_element(text, type="span") {
+    let element = document.createElement(type);
     element.innerText = "\n" + text;
+    return element;
+}
+
+function add_element(description, text, type="span") {
+    let element = create_description_element(text, type);
+    description.appendChild(element);
     return element;
 }
 
@@ -88,14 +94,6 @@ function delete_previous_lyrics() {
     if (element) {
         element.remove();
     }
-}
-
-function add_lyrics(text) {
-    let description_box = prepare_description();
-    let credits = create_description_element("\nYTLyrics Version 0.1")
-    description_box.appendChild(credits);
-    let description_element = create_description_element(text);
-    description_box.appendChild(description_element);
 }
 
 async function search(access_token, query) {
@@ -130,16 +128,24 @@ async function main() {
         }
         previous_title = full_title;
         delete_previous_lyrics();
+
+        let description = prepare_description();
+        add_element(description, "\n~ YTLyrics ~");
+
         let title = filter_title(full_title);
         let json = await search(access_token, title);
         if (!json) {
-            add_lyrics("Lyrics couldn't be found.");
+            add_element(description, "Lyrics couldn't be found.");
             return;
         }
+
         let url_path = json["response"]["hits"][0]["result"]["path"];
         let full_path = "https://genius.com" + url_path;
+        let source = add_element(description, full_path, "a");
+        source.href = full_path;
+
         let lyrics = await get_lyrics(full_path);
-        add_lyrics(lyrics);
+        add_element(description, lyrics);
     }
 }
 
