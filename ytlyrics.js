@@ -119,9 +119,25 @@ function watching() {
     return window.location.href.includes("watch?v=");
 }
 
-function click() {
+async function click() {
     let input = document.getElementById("query_input");
     let new_query = input.value;
+    let json = await search(access_token, new_query);
+    if (!json) {
+        document.getElementById("lyrics_error").innerText("Lyrics couldn't be found");
+        return;
+    }
+
+    let url_path = json["response"]["hits"][0]["result"]["path"];
+    let full_path = "https://genius.com" + url_path;
+    let source = document.getElementById("lyrics_source");
+    source.innerText = full_path;
+    source.href = full_path;
+
+    let lyrics = await get_lyrics(full_path);
+    let lyrics_element = document.getElementById("lyrics_element");
+    lyrics_element.innerText = lyrics;
+
 }
 
 async function main() {
@@ -139,13 +155,15 @@ async function main() {
         let title = filter_title(full_title);
         let json = await search(access_token, title);
         if (!json) {
-            add_element(description, "Lyrics couldn't be found.");
+            let error = add_element(description, "Lyrics couldn't be found.");
+            error.id = "lyrics_error";
             return;
         }
 
         let url_path = json["response"]["hits"][0]["result"]["path"];
         let full_path = "https://genius.com" + url_path;
         let source = add_element(description, full_path, "a");
+        source.id = "lyrics_source";
         source.href = full_path;
 
         add_element(description, "Wrong Lyrics?\n");
@@ -163,12 +181,14 @@ async function main() {
         button.onclick = click;
         button.style.visibility = "hidden";
         button.style.width = "100px";
+        button.style.height = "25px";
         description.appendChild(button);
 
         add_element(description, "");
 
         let lyrics = await get_lyrics(full_path);
-        add_element(description, lyrics);
+        let lyrics_element = add_element(description, lyrics);
+        lyrics_element.id = "lyrics_element";
 
         input.style.visibility = "visible";
         button.style.visibility = "visible";
