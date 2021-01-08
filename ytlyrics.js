@@ -151,9 +151,10 @@ async function update(full_title) {
         song.innerText = "Lyrics not found."; 
         return;
     }
-    let song_title  = json["response"]["hits"][0]["result"]["full_title"] + "\n"
-    song.innerText = song_title;
-    let url_path = json["response"]["hits"][0]["result"]["path"];
+    let top_result = json["response"]["hits"][0]["result"];
+    let genius_title  = top_result["full_title"] + "\n"
+    song.innerText = genius_title;
+    let url_path = top_result["path"];
     let full_path = "https://genius.com" + url_path + "\n";
     source.innerText = full_path + "\n";
     source.href = full_path;
