@@ -114,7 +114,7 @@ async function get_lyrics(url) {
     let text = await response.text();
     let parser = new DOMParser();
     let wrapper = parser.parseFromString(text, "text/html");
-    let lyrics = wrapper.getElementsByClassName("lyrics")[0];
+    let lyrics = wrapper.querySelector("p");
     return lyrics.innerText;
 }
 
