@@ -65,8 +65,7 @@ function filter_title(title) {
 
 function get_title() {
     let elements = document.getElementsByClassName("title style-scope ytd-video-primary-info-renderer");
-    let title = elements[0].firstChild.innerText;
-    return title;
+    return elements[0].firstChild.innerText;
 }
 
 function create_description_element(text, type="span") {
