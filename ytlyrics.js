@@ -144,6 +144,8 @@ async function main() {
         let source = add_element(description, full_path, "a");
         source.href = full_path;
 
+        add_element(description, "");
+
         let lyrics = await get_lyrics(full_path);
         add_element(description, lyrics);
     }
