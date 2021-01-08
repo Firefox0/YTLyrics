@@ -152,17 +152,8 @@ async function update(full_title) {
     source.innerText = full_path;
     source.href = full_path;
 
-    wrong_lyrics.style.visibility = "visible";
-    input.style.visibility = "visible";
-    button.style.visiblity = "visible";
-
-    seperator.style.visiblity = "visible";
-
     let lyrics = await get_lyrics(full_path);
     lyrics_element.innerText = lyrics;
-
-    input.style.visibility = "visible";
-    button.style.visibility = "visible";
 }
 
 async function main() {
@@ -191,14 +182,12 @@ let wrong_lyrics = create_description_element("Wrong Lyrics?\n");
 
 let input = document.createElement("input");
 input.setAttribute("type", "input");
-input.style.visibility = "hidden";
 input.style.width = "200px";
 
 let button = document.createElement("input");
 button.setAttribute("type", "button");
 button.setAttribute("value", "Submit");
 button.onclick = click;
-button.style.visibility = "hidden";
 button.style.width = "100px";
 button.style.height = "25px";
 
