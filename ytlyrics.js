@@ -93,7 +93,7 @@ function delete_previous_lyrics() {
 }
 
 async function search(access_token, query) {
-    // 
+    // Get response from genius for a query.
     let response = await fetch("https://api.genius.com/search?q=" + query, {
         headers: {"Authorization": "Bearer " + access_token}
     });
