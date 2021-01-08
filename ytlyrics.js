@@ -68,13 +68,13 @@ function get_title() {
     return elements[0].firstChild.innerText;
 }
 
-function create_description_element(text, type="span") {
+function create_description_element(text="", type="span") {
     let element = document.createElement(type);
     element.innerText = "\n" + text;
     return element;
 }
 
-function add_element(description, text, type="span") {
+function add_element(description, text="", type="span") {
     let element = create_description_element(text, type);
     description.appendChild(element);
     return element;
@@ -143,7 +143,7 @@ async function main() {
         let source = add_element(description, full_path, "a");
         source.href = full_path;
 
-        add_element(description, "");
+        add_element(description);
 
         let lyrics = await get_lyrics(full_path);
         add_element(description, lyrics);
