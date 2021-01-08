@@ -128,7 +128,6 @@ function init() {
         let elements = [
             script_name, status, wrong_lyrics, input, button, seperator, lyrics_element
         ];
-        console.log(script_name);
         for (i in elements) {
             description.appendChild(elements[i]);
         }
