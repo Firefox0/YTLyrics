@@ -74,12 +74,6 @@ function create_description_element(text, type="span") {
     return element;
 }
 
-function add_element(description, text, type="span") {
-    let element = create_description_element(text, type);
-    description.appendChild(element);
-    return element;
-}
-
 function prepare_description() {
     let description_div = document.getElementById("description");
     let new_div = document.createElement("div");
@@ -138,6 +132,9 @@ function init() {
 async function update(full_title) {
     delete_previous_lyrics();
 
+    status.innerText = "Loading...";
+    status.removeAttribute("href");
+
     let title = filter_title(full_title);
     let json = await search(access_token, title);
     if (!json) {
@@ -170,22 +167,23 @@ async function main() {
 let previous_title = "";
 let access_token = get_access_token();
 
-let script_name = create_description_element("\nYTLyrics\n");
+let script_name = create_description_element("\nYTLyrics\n", "h3");
 
 let status = create_description_element("", "a");
 status.href = "";
 
-let wrong_lyrics = create_description_element("Wrong Lyrics?\n");
+let wrong_lyrics = create_description_element("Search:\n");
 
 let input = document.createElement("input");
 input.setAttribute("type", "input");
 input.style.width = "200px";
+input.style.height = "17px";
 
 let button = document.createElement("input");
 button.setAttribute("type", "button");
 button.setAttribute("value", "Submit");
 button.onclick = click;
-button.style.width = "100px";
+button.style.width = "80px";
 button.style.height = "25px";
 
 let seperator = create_description_element("\n");
