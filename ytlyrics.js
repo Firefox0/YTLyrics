@@ -18,11 +18,15 @@ function filter_title(title) {
 }
 
 function prepare_description() {
-    // Create a section to load all the lyrics elements.
+    // Create a seperate space in the description for all new elements.
     let description_div = document.getElementById("description");
     let new_div = document.createElement("div");
     description_div.insertAdjacentElement("afterend", new_div);
-    return new_div;
+    let line_break = document.createElement("span");
+    line_break.innerText = "\n";
+    new_div.appendChild(line_break);
+    new_div.appendChild(show_hide_button);
+    new_div.appendChild(section);
 }
 
 function delete_previous_lyrics() {
@@ -105,21 +109,31 @@ function init() {
     // Elements persist even when you are clicking on a new video.
     // So instead of reloading the elements you can just manipulate them.
     if (watching_video()) {
-        let description = prepare_description();
-        let elements = [
-            script_name, hint, input, button, seperator, song, source, lyrics_element
-        ];
-        for (i in elements) {
-            description.appendChild(elements[i]);
+        prepare_description();
+        for (i in all_elements) {
+            section.appendChild(all_elements[i]);
         }
         clearInterval(init_interval);
+    }
+}
+
+function show_hide() {
+    if (show) {
+        show = 0
+        show_hide_button.setAttribute("value", "Show Lyrics");
+        section.style.display = "none";
+    }
+    else {
+        show = 1;
+        show_hide_button.setAttribute("value", "Hide Lyrics");
+        section.style.display = "inline";
     }
 }
 
 let previous_title = "";
 
 let script_name = document.createElement("h3");
-script_name.innerText = "\nYTLyrics";
+script_name.innerText = "\nYTLyrics\n";
 
 let source = document.createElement("a");
 let hint = document.createElement("span");
@@ -142,6 +156,19 @@ seperator.innerText = "\n";
 
 let song = document.createElement("span");
 let lyrics_element = document.createElement("span");
+
+let all_elements = [script_name, hint, input, button, seperator, song, source, lyrics_element]
+
+let show = 0;
+let show_hide_button = document.createElement("input");
+show_hide_button.setAttribute("type", "button");
+show_hide_button.setAttribute("value", "Show Lyrics");
+show_hide_button.onclick = show_hide;
+show_hide_button.style.width = "90px"
+show_hide_button.style.height = "25px";
+
+let section = document.createElement("div");
+section.style.display = "none";
 
 setInterval(watching_new_video, 1000);
 let init_interval = setInterval(init, 1000);
