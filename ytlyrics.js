@@ -32,16 +32,6 @@ function delete_previous_lyrics() {
     lyrics_element.innerText = "";
 }
 
-async function get_lyrics(url) {
-    // Scrape the lyrics from genius.
-    let response = await fetch(url);
-    let text = await response.text();
-    let parser = new DOMParser();
-    let wrapper = parser.parseFromString(text, "text/html");
-    let lyrics = wrapper.querySelector("p");
-    return lyrics.innerText;
-}
-
 function watching() {
     // Check if user is watching a video.
     return window.location.href.includes("watch?v=");
