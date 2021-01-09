@@ -78,11 +78,10 @@ async function search_duckduckgo(query) {
     }
 }
 
-async function update(full_title) {
+async function update(title) {
     // Update the description.
     delete_previous_lyrics();
     song.innerText = "Loading...\n";
-    let title = filter_title(full_title);
     let top_result_url = await search_duckduckgo(title);
     source.innerText = top_result_url + "\n\n";
     source.href = top_result_url;
@@ -105,7 +104,8 @@ async function main() {
             return;
         }
         previous_title = full_title;
-        update(full_title);
+        let title = filter_title(full_title);
+        update(title);
     }
 }
 
