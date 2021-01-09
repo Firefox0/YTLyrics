@@ -97,9 +97,9 @@ async function update(title) {
     let text = await response.text();
     let parser = new DOMParser();
     let wrapper = parser.parseFromString(text, "text/html");
-    let genius_artist = wrapper.getElementsByClassName("header_with_cover_art-primary_info-primary_artist")[0].innerText;
-    let genius_title = wrapper.getElementsByClassName("header_with_cover_art-primary_info-title")[0].innerText;
-    song.innerText = genius_artist + " " + genius_title + "\n";
+    let genius_song = wrapper.querySelector("meta[property='og:title']")
+                             .getAttribute("content");
+    song.innerText = genius_song + "\n";
     let lyrics = wrapper.querySelector("p").innerText;
     lyrics_element.innerText = lyrics;
 }
