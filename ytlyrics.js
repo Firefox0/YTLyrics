@@ -1,65 +1,6 @@
-function initialize_genius() {
-    // The user will get redirected to genius to login and then
-    // approve the application to get an access token.
-    let url = new URL("https://api.genius.com/oauth/authorize");
-    let options = {
-            "client_id": "4w_T6z86ikWmWAL4VCgvfUKJfQDWYTqVvGt-q1bBywqpM9BzLFYQFiLxZAwwYnJT", 
-            "scope": "me create_annotation",
-            "response_type": "token",
-            "state": ""
-    }
-    for (e in options) {
-        url.searchParams.append(e, options[e]);
-    }
-    window.location = url.href;
-}
-
-function create_cookie(access_token) {
-    document.cookie = "access_token=" + access_token;
-}
-
-function read_cookies() {
-    return document.cookie;
-}
-
-function get_cookie_value(cookies, key) {
-    // Get a specific value from cookies.
-    let split_cookies = cookies.split("; ");
-    for (i in split_cookies) {
-        let cookie = split_cookies[i].split("=");
-        let cookie_key = cookie[0];
-        if (cookie_key == key) {
-            return cookie[1];
-        }
-    }
-    return null;
-}
-
-function extract_access_token(url) {
-    return url.split("&")[0].substring(14);
-}
-
-function get_access_token() {
-    // Try to get an access token.
-    // If an access token is unavailable then the user
-    // will get redirected to genius.
-    let cookies = read_cookies();
-    let access_token = get_cookie_value(cookies, "access_token");
-    if (!access_token) {
-        if (window.location.hash) {
-            let access_token = extract_access_token(window.location.hash.toString());
-            create_cookie(access_token);
-        }
-        else {
-            initialize_genius();
-        }
-    } 
-    return access_token;
-}
-
 function filter_title(title) {
     // Filter unnecessary parts of the title to increase
-    // the chance of getting proper results from genius.
+    // the chance of getting proper results.
     let forbidden = ["[", "("];
     let char;
     for (i in forbidden) {
@@ -71,8 +12,7 @@ function filter_title(title) {
     return title;
 }
 
-function get_title() {
-    // Get the youtube title of a video.
+function get_youtube_title() {
     let elements = document.getElementsByClassName("title style-scope ytd-video-primary-info-renderer");
     return elements[0].firstChild.innerText;
 }
@@ -92,20 +32,8 @@ function delete_previous_lyrics() {
     lyrics_element.innerText = "";
 }
 
-async function search(access_token, query) {
-    // Get response from genius for a query.
-    let response = await fetch("https://api.genius.com/search?q=" + query, {
-        headers: {"Authorization": "Bearer " + access_token}
-    });
-    let json = await response.json();
-    if (!json["response"]["hits"]["length"]) {
-        return null;
-    } 
-    return json;
-}
-
 async function get_lyrics(url) {
-    // Scrape the lyrics from a genius website.
+    // Scrape the lyrics from genius.
     let response = await fetch(url);
     let text = await response.text();
     let parser = new DOMParser();
@@ -141,32 +69,48 @@ function init() {
     }
 }
 
+async function search_duckduckgo(query) {
+    // Return the href for the top genius result.
+    let url = "https://html.duckduckgo.com/html/?q=" + query;
+    let response = await fetch(url, {
+        headers: {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0"}
+    });
+    let text = await response.text();
+    let parser = new DOMParser();
+    let wrapper = parser.parseFromString(text, "text/html");
+    let search_results = wrapper.getElementsByClassName("result__url");
+    let current_url = "";
+    for (i in search_results) {
+        current_url = search_results[i].href;
+        if (current_url.includes("genius.com")) {
+            return current_url;
+        }
+    }
+}
+
 async function update(full_title) {
     // Update the description.
     delete_previous_lyrics();
-    song.innerText = "Loading...";
+    song.innerText = "Loading...\n";
     let title = filter_title(full_title);
-    let json = await search(access_token, title);
-    if (!json) {
-        song.innerText = "Lyrics not found."; 
-        return;
-    }
-    let top_result = json["response"]["hits"][0]["result"];
-    let genius_title  = top_result["full_title"] + "\n"
-    song.innerText = genius_title;
-    lyrics_element.innerText = "Loading...";
-    let url_path = top_result["path"];
-    let full_path = "https://genius.com" + url_path + "\n";
-    source.innerText = full_path + "\n";
-    source.href = full_path;
-    let lyrics = await get_lyrics(full_path);
+    let top_result_url = await search_duckduckgo(title);
+    source.innerText = top_result_url + "\n\n";
+    source.href = top_result_url;
+    let response = await fetch(top_result_url);
+    let text = await response.text();
+    let parser = new DOMParser();
+    let wrapper = parser.parseFromString(text, "text/html");
+    let genius_artist = wrapper.getElementsByClassName("header_with_cover_art-primary_info-primary_artist")[0].innerText;
+    let genius_title = wrapper.getElementsByClassName("header_with_cover_art-primary_info-title")[0].innerText;
+    song.innerText = genius_artist + " " + genius_title + "\n";
+    let lyrics = wrapper.querySelector("p").innerText;
     lyrics_element.innerText = lyrics;
 }
 
 async function main() {
     // Check if user is watching a new video.
     if (watching()) {
-        let full_title = get_title();
+        let full_title = get_youtube_title();
         if (previous_title == full_title) {
             return;
         }
@@ -176,7 +120,6 @@ async function main() {
 }
 
 let previous_title = "";
-let access_token = get_access_token();
 
 let script_name = document.createElement("h3")
 script_name.innerText = "\nYTLyrics";
