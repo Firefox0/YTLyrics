@@ -61,7 +61,7 @@ function init() {
 
 async function search_duckduckgo(query) {
     // Return the href for the top genius result.
-    let url = "https://html.duckduckgo.com/html/?q=lyrics " + encodeURIComponent(" " + query);
+    let url = "https://html.duckduckgo.com/html/?q=lyrics" + encodeURIComponent(" " + query);
     let response = await fetch(url, {
         headers: {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0"}
     });
