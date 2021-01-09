@@ -53,13 +53,14 @@ function watching_new_video() {
     }
 }
 
-async function submit() {
+function submit() {
     // Use query from text input to update the description.
     let new_query = input.value;
     update_description(new_query);
 }
 
 function display_lyrics() {
+    // Show or hide elements.
     if (display) {
         display = 0
         display_button.setAttribute("value", "Show Lyrics");
@@ -97,7 +98,6 @@ async function search_duckduckgo(query) {
 
 async function update_description(title) {
     // Update the description.
-
     delete_previous_lyrics();
     song.innerText = "Loading...\n";
     let top_result_url = await search_duckduckgo(title);
@@ -124,6 +124,7 @@ function init() {
     // So instead of reloading the elements you can just manipulate them.
     if (watching_video()) {
         prepare_description();
+        let all_elements = [script_name, hint, input, button, seperator, song, source, lyrics_element];
         for (i in all_elements) {
             section.appendChild(all_elements[i]);
         }
@@ -157,8 +158,6 @@ seperator.innerText = "\n";
 
 let song = document.createElement("span");
 let lyrics_element = document.createElement("span");
-
-let all_elements = [script_name, hint, input, button, seperator, song, source, lyrics_element]
 
 let display = 0;
 let display_button = document.createElement("input");
