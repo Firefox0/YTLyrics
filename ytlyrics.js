@@ -72,10 +72,14 @@ async function search_duckduckgo(query) {
     let current_url = "";
     for (i in search_results) {
         current_url = search_results[i].href;
+        if (!current_url) {
+            return null;
+        }
         if (current_url.includes("genius.com")) {
             return current_url;
         }
     }
+    return null;
 }
 
 async function update(title) {
@@ -83,6 +87,10 @@ async function update(title) {
     delete_previous_lyrics();
     song.innerText = "Loading...\n";
     let top_result_url = await search_duckduckgo(title);
+    if (!top_result_url) {
+        song.innerText = "Couldn't find the lyrics.";
+        return;
+    }
     source.innerText = top_result_url + "\n\n";
     source.href = top_result_url;
     let response = await fetch(top_result_url);
