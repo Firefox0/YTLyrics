@@ -47,6 +47,9 @@ function watching_new_video() {
         if (previous_title == full_title) {
             return;
         }
+        if (display) {
+            toggle_display();
+        }
         previous_title = full_title;
         let title = filter_title(full_title);
         update_description(title);
@@ -59,7 +62,7 @@ function submit() {
     update_description(new_query);
 }
 
-function display_lyrics() {
+function toggle_display() {
     // Show or hide elements.
     if (display) {
         display = 0
@@ -199,7 +202,7 @@ let display = 0;
 let display_button = document.createElement("input");
 display_button.setAttribute("type", "button");
 display_button.setAttribute("value", "Show Lyrics");
-display_button.onclick = display_lyrics;
+display_button.onclick = toggle_display;
 display_button.style.width = "90px"
 display_button.style.height = "25px";
 
