@@ -115,9 +115,7 @@ async function update_description(title) {
 }
 
 function html_to_text(html) {
-    let element = document.createElement("div");
-    element.innerHTML = html;
-    return element.innerText;
+    return html.replace(/<[^>]*>/g, "");
 }
 
 function genius(wrapper) {
