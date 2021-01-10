@@ -111,11 +111,49 @@ async function update_description(title) {
     let text = await response.text();
     let parser = new DOMParser();
     let wrapper = parser.parseFromString(text, "text/html");
+    genius(wrapper);
+}
+
+function html_to_text(html) {
+    let element = document.createElement("div");
+    element.innerHTML = html;
+    return element.innerText;
+}
+
+function genius(wrapper) {
+    // Scrape some stuff from genius and put it into the description.
     let genius_song = wrapper.querySelector("meta[property='og:title']")
                              .getAttribute("content");
     song.innerText = genius_song + "\n";
     let lyrics = wrapper.querySelector("p").innerText;
+    // Genius is sometimes changing the HTML.
+    // The lyrics needs to be scraped with a different algorithm.
+    // Output of lyrics when the HTML changes is "Produced by" only.
+    if (lyrics.length <= 15) {
+        lyrics = get_genius_lyrics_alternative(wrapper);
+    }
     lyrics_element.innerText = lyrics;
+}
+
+function get_genius_lyrics_alternative(wrapper) {
+    // An alternative way to get the lyrics from genius when the HTML changes.
+    let classes = wrapper.querySelectorAll("*");
+    let element;
+    let lyrics = "";
+    for (i in classes) {
+        element = classes[i];
+        try {
+            if (element.className.includes("Lyrics__Container-sc-")) {
+                // Convert <br> explicitly, otherwise it will just
+                // get consumed later without adding a new line.
+                lyrics += element.innerHTML.replaceAll("<br>", "\n");
+            }
+        }
+        catch {
+            continue;
+        }
+    }
+    return html_to_text(lyrics);
 }
 
 function init() {
