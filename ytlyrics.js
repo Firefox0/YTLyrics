@@ -66,12 +66,12 @@ function toggle_display() {
     // Show or hide elements.
     if (display) {
         display = 0
-        display_button.setAttribute("value", "Show Lyrics");
+        display_button.setAttribute("value", "show lyrics");
         section.style.display = "none";
     }
     else {
         display = 1;
-        display_button.setAttribute("value", "Hide Lyrics");
+        display_button.setAttribute("value", "hide lyrics");
         section.style.display = "inline";
     }
 }
@@ -163,7 +163,7 @@ function init() {
     // So instead of reloading the elements you can just manipulate them.
     if (watching_video()) {
         prepare_description();
-        let all_elements = [script_name, hint, input, button, seperator, song, source, lyrics_element];
+        let all_elements = [script_name, input, submit_button, seperator, song, source, lyrics_element];
         for (i in all_elements) {
             section.appendChild(all_elements[i]);
         }
@@ -173,24 +173,19 @@ function init() {
 
 let previous_title = "";
 
-let script_name = document.createElement("h3");
+let script_name = document.createElement("h4");
 script_name.innerText = "\nYTLyrics\n";
 
 let source = document.createElement("a");
-let hint = document.createElement("span");
-hint.innerText = "Search:\n";
 
 let input = document.createElement("input");
-input.setAttribute("type", "input")
-input.style.width = "200px";
-input.style.height = "17px";
-
-let button = document.createElement("input");
-button.setAttribute("type", "button");
-button.setAttribute("value", "Submit");
-button.onclick = submit;
-button.style.width = "80px"
-button.style.height = "25px";
+input.setAttribute("type", "input");
+input.setAttribute("value", "Search");
+input.style.fontSize = "14px";
+input.style.fontFamily = "Roboto";
+input.style.fontWeight = "400";
+input.style.lineHeight = "24px";
+input.style.border = "1px solid";
 
 let seperator = document.createElement("span");
 seperator.innerText = "\n";
@@ -200,11 +195,28 @@ let lyrics_element = document.createElement("span");
 
 let display = 0;
 let display_button = document.createElement("input");
-display_button.setAttribute("type", "button");
-display_button.setAttribute("value", "Show Lyrics");
+display_button.setAttribute("value", "show lyrics");
 display_button.onclick = toggle_display;
-display_button.style.width = "90px"
-display_button.style.height = "25px";
+display_button.style.padding = "0px";
+
+let submit_button = document.createElement("input");
+submit_button.setAttribute("value", "Submit");
+submit_button.onclick = submit;
+
+let buttons = [display_button, submit_button];
+for (i in buttons) {
+    buttons[i].setAttribute("type", "button");
+    buttons[i].style.background = "none";
+    buttons[i].style.border = "none";
+    buttons[i].style.cursor = "pointer";
+    buttons[i].style.color = "#606060";
+    buttons[i].style.marginTop = "8px";
+    buttons[i].style.fontSize = "1.3rem";
+    buttons[i].style.fontWeight = "500";
+    buttons[i].style.letterSpacing = "0.007px";
+    buttons[i].style.textTransform = "uppercase";
+    buttons[i].style.fontFamily = "Roboto";
+}
 
 let section = document.createElement("div");
 section.style.display = "none";
