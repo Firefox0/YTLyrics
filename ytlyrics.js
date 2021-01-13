@@ -1,3 +1,20 @@
+function create_youtube_button(value) {
+    let button = document.createElement("input");
+    button.setAttribute("type", "button");
+    button.setAttribute("value", value);
+    button.style.background = "none";
+    button.style.border = "none";
+    button.style.cursor = "pointer";
+    button.style.color = "#606060";
+    button.style.marginTop = "8px";
+    button.style.fontSize = "1.3rem";
+    button.style.fontWeight = "500";
+    button.style.letterSpacing = "0.007px";
+    button.style.textTransform = "uppercase";
+    button.style.fontFamily = "Roboto";
+    return button;
+}
+
 function filter_title(title) {
     // Filter unnecessary parts of the title to increase
     // the chance of getting proper results.
@@ -190,29 +207,12 @@ let song = document.createElement("span");
 let lyrics_element = document.createElement("span");
 
 let display = 0;
-let display_button = document.createElement("input");
-display_button.setAttribute("value", "show lyrics");
+let display_button = create_youtube_button("show lyrics");
 display_button.onclick = toggle_display;
 display_button.style.padding = "0px";
 
-let submit_button = document.createElement("input");
-submit_button.setAttribute("value", "Submit");
+let submit_button = create_youtube_button("submit");
 submit_button.onclick = submit;
-
-let buttons = [display_button, submit_button];
-for (i in buttons) {
-    buttons[i].setAttribute("type", "button");
-    buttons[i].style.background = "none";
-    buttons[i].style.border = "none";
-    buttons[i].style.cursor = "pointer";
-    buttons[i].style.color = "#606060";
-    buttons[i].style.marginTop = "8px";
-    buttons[i].style.fontSize = "1.3rem";
-    buttons[i].style.fontWeight = "500";
-    buttons[i].style.letterSpacing = "0.007px";
-    buttons[i].style.textTransform = "uppercase";
-    buttons[i].style.fontFamily = "Roboto";
-}
 
 let section = document.createElement("div");
 section.style.display = "none";
