@@ -1,8 +1,3 @@
-function get_youtube_title() {
-    let elements = document.getElementsByClassName("title style-scope ytd-video-primary-info-renderer");
-    return elements[0].firstChild.innerText;
-}
-
 function filter_title(title) {
     // Filter unnecessary parts of the title to increase
     // the chance of getting proper results.
@@ -43,15 +38,16 @@ function watching_video() {
 function watching_new_video() {
     // Check if user is watching a new video.
     if (watching_video()) {
-        let full_title = get_youtube_title();
-        if (previous_title == full_title) {
+        let youtube_title = document.querySelector("meta[property='og:title']")
+                                    .getAttribute("content");
+        if (previous_title == youtube_title) {
             return;
         }
         if (display) {
             toggle_display();
         }
-        previous_title = full_title;
-        let title = filter_title(full_title);
+        previous_title = youtube_title;
+        let title = filter_title(youtube_title);
         update_description(title);
     }
 }
