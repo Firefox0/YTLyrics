@@ -109,7 +109,7 @@ async function search_duckduckgo(query) {
         if (!current_url) {
             return null;
         }
-        if (current_url.includes("genius.com")) {
+        if (current_url.includes("genius.com") && !current_url.includes("/artists/")) {
             return current_url;
         }
     }
