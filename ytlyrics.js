@@ -180,7 +180,8 @@ function init() {
     // So instead of reloading the elements you can just manipulate them.
     if (watching_video()) {
         prepare_description();
-        let all_elements = [input, submit_button, seperator, song, source, lyrics_element];
+        let all_elements = [document.createElement("br"), input, submit_button, 
+                            document.createElement("br"), song, source, lyrics_element];
         for (i in all_elements) {
             section.appendChild(all_elements[i]);
         }
@@ -200,9 +201,6 @@ input.style.fontFamily = "Roboto";
 input.style.fontWeight = "400";
 input.style.lineHeight = "24px";
 input.style.border = "1px solid";
-
-let seperator = document.createElement("span");
-seperator.innerText = "\n";
 
 let song = document.createElement("span");
 let lyrics_element = document.createElement("span");
