@@ -200,8 +200,13 @@ input.style.fontSize = "14px";
 input.style.fontFamily = "Roboto";
 input.style.fontWeight = "400";
 input.style.lineHeight = "24px";
-input.style.border = "1px solid";
+input.style.border = "1px solid gray";
 input.style.paddingLeft = "5px";
+input.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+        submit();
+    }
+});
 
 let song = document.createElement("span");
 let lyrics_element = document.createElement("span");
