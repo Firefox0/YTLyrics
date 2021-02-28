@@ -195,7 +195,7 @@ let source = document.createElement("a");
 
 let input = document.createElement("input");
 input.setAttribute("type", "input");
-input.setAttribute("value", "Search");
+input.setAttribute("placeholder", "Search");
 input.style.fontSize = "14px";
 input.style.fontFamily = "Roboto";
 input.style.fontWeight = "400";
