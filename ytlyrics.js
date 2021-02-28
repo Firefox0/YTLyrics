@@ -39,8 +39,7 @@ function prepare_description() {
     let description_div = document.getElementById("description");
     let new_div = document.createElement("div");
     description_div.insertAdjacentElement("afterend", new_div);
-    let line_break = document.createElement("span");
-    line_break.innerText = "\n";
+    let line_break = document.createElement("br");
     new_div.appendChild(line_break);
     new_div.appendChild(display_button);
     new_div.appendChild(section);
