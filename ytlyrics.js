@@ -89,7 +89,7 @@ function toggle_display() {
     else {
         display = 1;
         display_button.setAttribute("value", "hide lyrics");
-        section.style.display = "inline";
+        section.style.display = "block";
     }
 }
 
@@ -180,7 +180,7 @@ function init() {
     // So instead of reloading the elements you can just manipulate them.
     if (watching_video()) {
         prepare_description();
-        let all_elements = [script_name, input, submit_button, seperator, song, source, lyrics_element];
+        let all_elements = [input, submit_button, seperator, song, source, lyrics_element];
         for (i in all_elements) {
             section.appendChild(all_elements[i]);
         }
@@ -189,9 +189,6 @@ function init() {
 }
 
 let previous_title = "";
-
-let script_name = document.createElement("h4");
-script_name.innerText = "\nYTLyrics\n";
 
 let source = document.createElement("a");
 
