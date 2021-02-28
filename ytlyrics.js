@@ -201,6 +201,7 @@ input.style.fontFamily = "Roboto";
 input.style.fontWeight = "400";
 input.style.lineHeight = "24px";
 input.style.border = "1px solid";
+input.style.paddingLeft = "5px";
 
 let song = document.createElement("span");
 let lyrics_element = document.createElement("span");
