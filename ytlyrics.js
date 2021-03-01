@@ -1,8 +1,3 @@
-function get_youtube_title() {
-    let elements = document.getElementsByClassName("title style-scope ytd-video-primary-info-renderer");
-    return elements[0].firstChild.innerText;
-}
-
 function create_youtube_button(value) {
     let button = document.createElement("input");
     button.setAttribute("type", "button");
@@ -34,42 +29,20 @@ function filter_title(title) {
     return title;
 }
 
-function prepare_description() {
-    // Create a seperate space in the description for all new elements.
-    let description_div = document.getElementById("description");
-    let new_div = document.createElement("div");
-    description_div.insertAdjacentElement("afterend", new_div);
-    let line_break = document.createElement("br");
-    new_div.appendChild(line_break);
-    new_div.appendChild(display_button);
-    new_div.appendChild(section);
-}
-
 function delete_previous_lyrics() {
     // Clear some elements of the previous lyrics.
     source.innerText = "";
     lyrics_element.innerText = "";
 }
 
-function watching_video() {
-    // Check if user is watching a video.
-    return window.location.href.includes("watch?v=");
-}
-
 function watching_new_video() {
     // Check if user is watching a new video.
-    if (watching_video()) {
-        let youtube_title = get_youtube_title();
-        if (previous_title == youtube_title) {
-            return;
-        }
-        if (display) {
-            toggle_display();
-        }
-        previous_title = youtube_title;
-        let title = filter_title(youtube_title);
-        update_description(title);
+    let youtube_title = document.title.replace(" - YouTube", "");
+    if (previous_title == youtube_title) {
+        return false;
     }
+    previous_title = youtube_title;
+    return youtube_title;
 }
 
 function submit() {
@@ -108,7 +81,7 @@ async function search_duckduckgo(query) {
         if (!current_url) {
             return null;
         }
-        if (current_url.includes("genius.com") && !current_url.includes("/artists/")) {
+        if (current_url.includes("https://genius.com") && !current_url.includes("/", 19)) {
             return current_url;
         }
     }
@@ -177,14 +150,33 @@ function init() {
     // Append elements to the description.
     // Elements persist even when you are clicking on a new video.
     // So instead of reloading the elements you can just manipulate them.
-    if (watching_video()) {
-        prepare_description();
-        let all_elements = [document.createElement("br"), input, submit_button, 
-                            document.createElement("br"), song, source, lyrics_element];
-        for (i in all_elements) {
-            section.appendChild(all_elements[i]);
+    // Create a seperate space in the description for all new elements.
+    let description = document.getElementById("description");
+    // Page didn't fully load yet.
+    if (!description) {
+        return;
+    }
+    let new_div = document.createElement("div");
+    description.insertAdjacentElement("afterend", new_div);
+    new_div.appendChild(document.createElement("br"));
+    new_div.appendChild(display_button);
+    new_div.appendChild(section);
+    let all_elements = [document.createElement("br"), input, submit_button, 
+                        document.createElement("br"), song, source, lyrics_element];
+    for (i in all_elements) {
+        section.appendChild(all_elements[i]);
+    }
+    clearInterval(init_interval);
+}
+
+function main() {
+    let youtube_title = watching_new_video();
+    if (youtube_title) {
+        if (display) {
+            toggle_display();
         }
-        clearInterval(init_interval);
+        let title = filter_title(youtube_title);
+        update_description(title);
     }
 }
 
@@ -221,5 +213,5 @@ submit_button.onclick = submit;
 let section = document.createElement("div");
 section.style.display = "none";
 
-setInterval(watching_new_video, 1000);
 let init_interval = setInterval(init, 1000);
+setInterval(main, 1000);
