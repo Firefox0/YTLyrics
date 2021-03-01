@@ -222,4 +222,4 @@ submit_button.onclick = submit;
 let section = document.createElement("div");
 section.style.display = "none";
 
-let init_interval = setInterval(init, 1000);
+let init_interval = setInterval(init, 250);
