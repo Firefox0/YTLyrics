@@ -170,7 +170,7 @@ function init() {
     }
     clearInterval(init_interval);
     // Start main loop after initialization is done.
-    setInterval(main, 1000);
+    setInterval(main, 250);
 }
 
 function main() {
