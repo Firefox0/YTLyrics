@@ -37,6 +37,11 @@ function delete_previous_lyrics() {
 
 function watching_new_video() {
     // Check if user is watching a new video.
+
+    // Check if user is watching a video.
+    if (!document.URL.includes("watch?v=")) {
+        return;
+    }
     let youtube_title = document.title.replace(" - YouTube", "");
     if (previous_title == youtube_title) {
         return false;
