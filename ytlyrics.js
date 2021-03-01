@@ -103,7 +103,8 @@ async function update_description(title) {
     let text = await response.text();
     let parser = new DOMParser();
     let wrapper = parser.parseFromString(text, "text/html");
-    genius(wrapper);
+    let lyrics = genius(wrapper);
+    lyrics_element.innerText = lyrics;
 }
 
 function html_to_text(html) {
@@ -122,7 +123,7 @@ function genius(wrapper) {
     if (lyrics.length <= 15) {
         lyrics = get_genius_lyrics_alternative(wrapper);
     }
-    lyrics_element.innerText = lyrics;
+    return lyrics;
 }
 
 function get_genius_lyrics_alternative(wrapper) {
