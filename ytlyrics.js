@@ -151,6 +151,7 @@ function init() {
     // Append elements to the description.
     // Elements persist even when you are clicking on a new video.
     // So instead of reloading the elements you can just manipulate them.
+
     // Create a seperate space in the description for all new elements.
     let description = document.getElementById("description");
     // Page didn't fully load yet.
@@ -168,6 +169,8 @@ function init() {
         section.appendChild(all_elements[i]);
     }
     clearInterval(init_interval);
+    // Start main loop after initialization is done.
+    setInterval(main, 1000);
 }
 
 function main() {
@@ -215,4 +218,3 @@ let section = document.createElement("div");
 section.style.display = "none";
 
 let init_interval = setInterval(init, 1000);
-setInterval(main, 1000);
