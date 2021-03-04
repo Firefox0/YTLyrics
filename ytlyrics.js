@@ -70,16 +70,18 @@ function toggle_display() {
     }
 }
 
+async function url_to_dom(url) {
+    let response = await fetch(url);
+    let text = await response.text();
+    let parser = new DOMParser();
+    return parser.parseFromString(text, "text/html");
+}
+
 async function search_duckduckgo(query) {
     // Return the href for the top genius result.
     let url = "https://html.duckduckgo.com/html/?q=lyrics" + encodeURIComponent(" " + query);
-    let response = await fetch(url, {
-        headers: {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0"}
-    });
-    let text = await response.text();
-    let parser = new DOMParser();
-    let wrapper = parser.parseFromString(text, "text/html");
-    let search_results = wrapper.getElementsByClassName("result__url");
+    let dom = await url_to_dom(url);
+    let search_results = dom.getElementsByClassName("result__url");
     let current_url = "";
     for (i in search_results) {
         current_url = search_results[i].href;
@@ -104,11 +106,7 @@ async function update_description(title) {
     }
     source.innerText = top_result_url + "\n\n";
     source.href = top_result_url;
-    let response = await fetch(top_result_url);
-    let text = await response.text();
-    let parser = new DOMParser();
-    let wrapper = parser.parseFromString(text, "text/html");
-    let lyrics = genius(wrapper);
+    let lyrics = await genius(top_result_url);
     lyrics_element.innerText = lyrics;
 }
 
@@ -116,24 +114,25 @@ function html_to_text(html) {
     return html.replace(/<[^>]*>/g, "");
 }
 
-function genius(wrapper) {
+async function genius(url) {
+    let dom = await url_to_dom(url);
     // Scrape some stuff from genius and put it into the description.
-    let genius_song = wrapper.querySelector("meta[property='og:title']")
+    let genius_song = dom.querySelector("meta[property='og:title']")
                              .getAttribute("content");
     song.innerText = genius_song + "\n";
-    let lyrics = wrapper.querySelector("p").innerText;
+    let lyrics = dom.querySelector("p").innerText;
     // Genius is sometimes changing the HTML.
     // The lyrics needs to be scraped with a different algorithm.
     // Output of lyrics when the HTML changes is "Produced by" only.
     if (lyrics.length <= 15) {
-        lyrics = get_genius_lyrics_alternative(wrapper);
+        lyrics = get_genius_lyrics_alternative(dom);
     }
     return lyrics;
 }
 
-function get_genius_lyrics_alternative(wrapper) {
+function get_genius_lyrics_alternative(dom) {
     // An alternative way to get the lyrics from genius when the HTML changes.
-    let classes = wrapper.querySelectorAll("*");
+    let classes = dom.querySelectorAll("*");
     let element;
     let lyrics = "";
     for (i in classes) {
