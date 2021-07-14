@@ -1,3 +1,38 @@
+let previous_title = "";
+
+let source = document.createElement("a");
+
+let input = document.createElement("input");
+input.setAttribute("type", "input");
+input.setAttribute("placeholder", "Search");
+input.style.fontSize = "14px";
+input.style.fontFamily = "Roboto";
+input.style.fontWeight = "400";
+input.style.lineHeight = "24px";
+input.style.border = "1px solid gray";
+input.style.paddingLeft = "5px";
+input.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+        submit();
+    }
+});
+
+let song = document.createElement("span");
+let lyrics_element = document.createElement("span");
+
+let display = 0;
+let display_button = create_youtube_button("show lyrics");
+display_button.onclick = toggle_display;
+display_button.style.padding = "0px";
+
+let submit_button = create_youtube_button("submit");
+submit_button.onclick = submit;
+
+let section = document.createElement("div");
+section.style.display = "none";
+
+let init_interval = setInterval(init, 250);
+
 function create_youtube_button(value) {
     let button = document.createElement("input");
     button.setAttribute("type", "button");
@@ -96,14 +131,16 @@ async function search_duckduckgo(query) {
 }
 
 async function update_description(title) {
-    // Update the description.
+    let filtered_title = filter_title(title);
     delete_previous_lyrics();
     song.innerText = "Loading...\n";
-    let top_result_url = await search_duckduckgo(title);
+
+    let top_result_url = await search_duckduckgo(filtered_title);
     if (!top_result_url) {
         song.innerText = "Couldn't find the lyrics.";
         return;
     }
+
     source.innerText = top_result_url + "\n\n";
     source.href = top_result_url;
     let lyrics = await genius(top_result_url);
@@ -151,7 +188,7 @@ function get_genius_lyrics_alternative(dom) {
     return html_to_text(lyrics);
 }
 
-function init() {
+function insert_lyrics_section() {
     // Append elements to the description.
     // Elements persist even when you are clicking on a new video.
     // So instead of reloading the elements you can just manipulate them.
@@ -160,7 +197,7 @@ function init() {
     let description = document.querySelector(".style-scope.ytd-video-secondary-info-renderer#description");
     // Page didn't fully load yet.
     if (!description) {
-        return;
+        return false;
     }
 
     let new_div = document.createElement("div");
@@ -173,6 +210,14 @@ function init() {
     for (i in all_elements) {
         section.appendChild(all_elements[i]);
     }
+
+    return true;
+}
+
+function init() {
+    if (!insert_lyrics_section()) {
+        return;
+    }
     clearInterval(init_interval);
     // Start main loop after initialization is done.
     setInterval(main, 250);
@@ -180,48 +225,12 @@ function init() {
 
 function main() {
     let youtube_title = watching_new_video();
-    if (youtube_title) {
-        if (display) {
-            toggle_display();
-        }
-        let title = filter_title(youtube_title);
-        update_description(title);
+    if (!youtube_title) {
+        return;
     }
+
+    if (display) {
+        toggle_display();
+    }
+    update_description(youtube_title);
 }
-
-let previous_title = "";
-
-let source = document.createElement("a");
-
-let input = document.createElement("input");
-input.setAttribute("type", "input");
-input.setAttribute("placeholder", "Search");
-input.style.fontSize = "14px";
-input.style.fontFamily = "Roboto";
-input.style.fontWeight = "400";
-input.style.lineHeight = "24px";
-input.style.border = "1px solid gray";
-input.style.paddingLeft = "5px";
-input.addEventListener("keydown", event => {
-    if (event.key === "Enter") {
-        submit();
-    }
-});
-
-let song = document.createElement("span");
-let lyrics_element = document.createElement("span");
-
-let display = 0;
-let display_button = create_youtube_button("show lyrics");
-display_button.onclick = toggle_display;
-display_button.style.padding = "0px";
-
-let submit_button = create_youtube_button("submit");
-submit_button.onclick = submit;
-
-let section = document.createElement("div");
-section.style.display = "none";
-
-let init_interval = setInterval(init, 250);
-
-window.addEventListener("locationchanged")
