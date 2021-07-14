@@ -157,11 +157,12 @@ function init() {
     // So instead of reloading the elements you can just manipulate them.
 
     // Create a seperate space in the description for all new elements.
-    let description = document.getElementById("description");
+    let description = document.querySelector(".style-scope.ytd-video-secondary-info-renderer#description");
     // Page didn't fully load yet.
     if (!description) {
         return;
     }
+
     let new_div = document.createElement("div");
     description.insertAdjacentElement("afterend", new_div);
     new_div.appendChild(document.createElement("br"));
@@ -222,3 +223,5 @@ let section = document.createElement("div");
 section.style.display = "none";
 
 let init_interval = setInterval(init, 250);
+
+window.addEventListener("locationchanged")
