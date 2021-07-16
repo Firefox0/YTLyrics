@@ -116,7 +116,15 @@ async function search_duckduckgo(query, website) {
     // Return the href for the top genius result.
     let url = "https://html.duckduckgo.com/html/?q=lyrics" + encodeURIComponent(" " + query + " site:" + website);
     let dom = await url_to_dom(url);
-    return dom.getElementsByClassName("result__url")[0].href;
+
+    let search_results = dom.getElementsByClassName("result__url");
+    if (!search_results.length) {
+        return null;
+    }
+
+    let result = search_results[0].href;
+
+    return result;
 }
 
 async function update_description(title) {
