@@ -15,7 +15,8 @@
 
     "permissions": [
       "*://genius.com/*",
-      "*://*.duckduckgo.com/*"
+      "*://*.duckduckgo.com/*",
+      "*://*.lyrics.com/*"
     ]
   
 }  
