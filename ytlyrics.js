@@ -1,3 +1,6 @@
+const WEBSITE = 0;
+const PARSER = 1;
+
 let previous_title = "";
 
 let source = document.createElement("a");
@@ -30,6 +33,8 @@ submit_button.onclick = submit;
 
 let section = document.createElement("div");
 section.style.display = "none";
+
+let websites = [["genius.com", genius], ["lyrics.com/lyric", lyricscom]];
 
 let init_interval = setInterval(init, 250);
 
@@ -115,6 +120,7 @@ async function url_to_dom(url) {
 async function search_duckduckgo(query, website) {
     // Return the href for the top genius result.
     let url = "https://html.duckduckgo.com/html/?q=lyrics" + encodeURIComponent(" " + query + " site:" + website);
+    console.log(url);
     let dom = await url_to_dom(url);
 
     let search_results = dom.getElementsByClassName("result__url");
@@ -130,17 +136,27 @@ async function search_duckduckgo(query, website) {
 async function update_description(title) {
     let filtered_title = filter_title(title);
     delete_previous_lyrics();
-    song.innerText = "Loading...\n";
+    let i;
+    let top_result_url;
 
-    let top_result_url = await search_duckduckgo(filtered_title, "genius.com");
+    for (i = 0; i < websites.length; i++) {
+        let website = websites[i][WEBSITE];
+        song.innerText = "Checking " + website.split(".")[0] + "...\n";
+        top_result_url = await search_duckduckgo(filtered_title, website);
+        if (top_result_url) {
+            break;
+        }
+    }
+
     if (!top_result_url) {
         song.innerText = "Couldn't find the lyrics.";
         return;
     }
 
+    song.innerText = filtered_title + "\n";
     source.innerText = top_result_url + "\n\n";
     source.href = top_result_url;
-    let lyrics = await genius(top_result_url);
+    let lyrics = await websites[i][PARSER](top_result_url);
     lyrics_element.innerText = lyrics;
 }
 
@@ -183,6 +199,11 @@ function get_genius_lyrics_alternative(dom) {
         }
     }
     return html_to_text(lyrics);
+}
+
+async function lyricscom(url) {
+    let dom = await url_to_dom(url);
+    return dom.querySelector("#lyric-body-text").innerText;
 }
 
 function insert_lyrics_section() {
