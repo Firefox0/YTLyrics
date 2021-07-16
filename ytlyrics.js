@@ -112,22 +112,11 @@ async function url_to_dom(url) {
     return parser.parseFromString(text, "text/html");
 }
 
-async function search_duckduckgo(query) {
+async function search_duckduckgo(query, website) {
     // Return the href for the top genius result.
-    let url = "https://html.duckduckgo.com/html/?q=lyrics" + encodeURIComponent(" " + query);
+    let url = "https://html.duckduckgo.com/html/?q=lyrics" + encodeURIComponent(" " + query + " site:" + website);
     let dom = await url_to_dom(url);
-    let search_results = dom.getElementsByClassName("result__url");
-    let current_url = "";
-    for (i in search_results) {
-        current_url = search_results[i].href;
-        if (!current_url) {
-            return null;
-        }
-        if (current_url.includes("https://genius.com") && !current_url.includes("/", 19)) {
-            return current_url;
-        }
-    }
-    return null;
+    return dom.getElementsByClassName("result__url")[0].href;
 }
 
 async function update_description(title) {
@@ -135,7 +124,7 @@ async function update_description(title) {
     delete_previous_lyrics();
     song.innerText = "Loading...\n";
 
-    let top_result_url = await search_duckduckgo(filtered_title);
+    let top_result_url = await search_duckduckgo(filtered_title, "genius.com");
     if (!top_result_url) {
         song.innerText = "Couldn't find the lyrics.";
         return;
