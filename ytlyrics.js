@@ -119,8 +119,8 @@ async function url_to_dom(url) {
 
 async function search_duckduckgo(query, website) {
     // Return the href for the top genius result.
+
     let url = "https://html.duckduckgo.com/html/?q=lyrics" + encodeURIComponent(" " + query + " site:" + website);
-    console.log(url);
     let dom = await url_to_dom(url);
 
     let search_results = dom.getElementsByClassName("result__url");
