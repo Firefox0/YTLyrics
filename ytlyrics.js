@@ -175,24 +175,20 @@ async function single_update(title) {
     let parser = websites[website_counter][PARSER];
 
     delete_previous_lyrics();
-    
+
     let top_result_url = await search_duckduckgo(filtered_title, website);    
     if (!top_result_url) {
         song.innerText = "Couldn't find the lyrics.";
         return;
     }
 
-    song.innerText = filtered_title + "\n";
     source.innerText = top_result_url + "\n\n";
     source.href = top_result_url;
 
     let lyrics = await parser(top_result_url);
     if (!lyrics) {
         song.innerText = "Couldn't parse lyrics.";
-        return;
-    }
-
-    lyrics_element.innerText = lyrics;
+    } 
 
     return lyrics;
 }
@@ -227,6 +223,9 @@ async function genius(url) {
     if (lyrics.length <= 15) {
         lyrics = get_genius_lyrics_alternative(dom);
     }
+
+    lyrics_element.innerText = lyrics;
+
     return lyrics;
 }
 
@@ -254,8 +253,15 @@ function get_genius_lyrics_alternative(dom) {
 
 async function lyricscom(url) {
     let dom = await url_to_dom(url);
+    
+    let artist = dom.querySelector(".lyric-artist").firstChild.innerText;
+    let title = dom.querySelector(".lyric-title").innerText;
+    let lyrics = dom.querySelector("#lyric-body-text").innerText;
 
-    lyrics_element.innerText = dom.querySelector("#lyric-body-text").innerText;
+    song.innerText = artist + " - " + title + "\n";
+    lyrics_element.innerText = lyrics;
+
+    return lyrics;
 }
 
 function append_elements(base, elements) {
