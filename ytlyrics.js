@@ -5,14 +5,14 @@ let previous_title = "";
 
 let source = document.createElement("a");
 
-let input = document.createElement("input");
-input.setAttribute("type", "input");
-input.setAttribute("placeholder", "Search");
-input.style.fontSize = "14px";
-input.style.fontFamily = "Roboto";
-input.style.fontWeight = "400";
-input.style.lineHeight = "24px";
-input.style.border = "1px solid gray";
+let input = document.createElement("input")
+input.setAttribute("type", "input")
+input.setAttribute("placeholder", "Search")
+input.style.fontSize = "14px"
+input.style.fontFamily = "Roboto"
+input.style.fontWeight = "400"
+input.style.lineHeight = "24px"
+input.style.border = "1px solid gray"
 input.style.paddingLeft = "5px";
 input.addEventListener("keydown", event => {
     if (event.key === "Enter") {
@@ -25,7 +25,7 @@ let lyrics_element = document.createElement("span");
 
 let display = 0;
 let display_button = create_youtube_button("show lyrics");
-display_button.onclick = toggle_display;
+display_button.onclick = toggle_display
 display_button.style.padding = "0px";
 
 let submit_button = create_youtube_button("submit");
@@ -61,6 +61,7 @@ function create_youtube_button(value) {
     button.style.letterSpacing = "0.007px";
     button.style.textTransform = "uppercase";
     button.style.fontFamily = "Roboto";
+
     return button;
 }
 
@@ -75,6 +76,7 @@ function filter_title(title) {
             return title.split(char)[0];
         }
     }
+
     return title;
 }
 
@@ -91,10 +93,12 @@ function watching_new_video() {
     if (!document.URL.includes("watch?v=")) {
         return;
     }
+
     let youtube_title = document.title.replace(" - YouTube", "");
     if (previous_title == youtube_title) {
         return false;
     }
+
     previous_title = youtube_title;
     submitted_query = youtube_title;
 
@@ -114,6 +118,7 @@ function back() {
     } else {
         website_counter--;
     }
+
     single_update(submitted_query);
 }
 
@@ -123,6 +128,7 @@ function next() {
     } else {
         website_counter++;
     }
+
     single_update(submitted_query);
 }
 
@@ -132,8 +138,7 @@ function toggle_display() {
         display = 0
         display_button.setAttribute("value", "show lyrics");
         section.style.display = "none";
-    }
-    else {
+    } else {
         display = 1;
         display_button.setAttribute("value", "hide lyrics");
         section.style.display = "block";
@@ -144,6 +149,7 @@ async function url_to_dom(url) {
     let response = await fetch(url);
     let text = await response.text();
     let parser = new DOMParser();
+
     return parser.parseFromString(text, "text/html");
 }
 
@@ -168,7 +174,7 @@ async function single_update(title) {
     let parser = websites[website_counter][PARSER];
 
     delete_previous_lyrics();
-
+    
     let top_result_url = await search_duckduckgo(filtered_title, website);    
     if (!top_result_url) {
         song.innerText = "Couldn't find the lyrics.";
@@ -181,7 +187,7 @@ async function single_update(title) {
 
     let lyrics = await parser(top_result_url);
     if (!lyrics) {
-        song.innerText = "Couldn't parse lyrics."
+        song.innerText = "Couldn't parse lyrics.";
         return;
     }
 
@@ -191,7 +197,7 @@ async function single_update(title) {
 }
 
 async function update_description(title) {
-
+    // Iterate through all lyrics websites and put the lyrics into the description.
     for (website_counter = 0; website_counter < websites.length; website_counter++) {
         if (await single_update(title)) {
             return;
@@ -241,12 +247,22 @@ function get_genius_lyrics_alternative(dom) {
             continue;
         }
     }
+
     return html_to_text(lyrics);
 }
 
 async function lyricscom(url) {
     let dom = await url_to_dom(url);
-    return dom.querySelector("#lyric-body-text").innerText;
+
+    lyrics_element.innerText = dom.querySelector("#lyric-body-text").innerText;
+}
+
+function append_elements(base, elements) {
+    let i;
+
+    for (i in elements) {
+        base.appendChild(elements[i]);
+    }
 }
 
 function insert_lyrics_section() {
@@ -261,14 +277,9 @@ function insert_lyrics_section() {
 
     let new_div = document.createElement("div");
     description.insertAdjacentElement("afterend", new_div);
-    new_div.appendChild(document.createElement("br"));
-    new_div.appendChild(display_button);
-    new_div.appendChild(section);
-    let all_elements = [document.createElement("br"), input, submit_button, back_button, next_button,
-                        document.createElement("br"), song, source, lyrics_element];
-    for (i in all_elements) {
-        section.appendChild(all_elements[i]);
-    }
+    append_elements(new_div, [document.createElement("br"), display_button, section]);
+    append_elements(section, [document.createElement("br"), input, submit_button, back_button, next_button,
+                              document.createElement("br"), song, source, lyrics_element]);
 
     return true;
 }
@@ -277,6 +288,7 @@ function init() {
     if (!insert_lyrics_section()) {
         return;
     }
+
     clearInterval(init_interval);
     setInterval(main, 250);
 }
