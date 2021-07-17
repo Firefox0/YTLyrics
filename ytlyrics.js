@@ -83,6 +83,7 @@ function filter_title(title) {
 function delete_previous_lyrics() {
     // Clear some elements of the previous lyrics.
     source.innerText = "";
+    source.href = "";
     lyrics_element.innerText = "";
 }
 
