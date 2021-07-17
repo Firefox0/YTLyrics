@@ -185,12 +185,18 @@ async function single_update(title) {
     source.innerText = top_result_url + "\n\n";
     source.href = top_result_url;
 
-    let lyrics = await parser(top_result_url);
-    if (!lyrics) {
-        song.innerText = "Couldn't parse lyrics.";
-    } 
+    let dom = await url_to_dom(top_result_url);
+    if (!dom) {
+        song.innerText = "Couldn't access the website.";
+        return false;
+    }
 
-    return lyrics;
+    if (!await parser(dom)) {
+        song.innerText = "Couldn't parse lyrics.";
+        return false;
+    }
+
+    return true;
 }
 
 async function update_description(title) {
@@ -208,10 +214,9 @@ function html_to_text(html) {
     return html.replace(/<[^>]*>/g, "");
 }
 
-async function genius(url) {
+async function genius(dom) {
     // Parse lyrics from a genius url.
 
-    let dom = await url_to_dom(url);
     // Scrape some stuff from genius and put it into the description.
     let genius_song = dom.querySelector("meta[property='og:title']")
                          .getAttribute("content");
@@ -251,9 +256,7 @@ function get_genius_lyrics_alternative(dom) {
     return html_to_text(lyrics);
 }
 
-async function lyricscom(url) {
-    let dom = await url_to_dom(url);
-    
+async function lyricscom(dom) {    
     let artist = dom.querySelector(".lyric-artist").firstChild.innerText;
     let title = dom.querySelector(".lyric-title").innerText;
     let lyrics = dom.querySelector("#lyric-body-text").innerText;
