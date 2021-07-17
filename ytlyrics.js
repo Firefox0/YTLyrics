@@ -31,10 +31,19 @@ display_button.style.padding = "0px";
 let submit_button = create_youtube_button("submit");
 submit_button.onclick = submit;
 
+let back_button = create_youtube_button("back");
+back_button.onclick = back;
+
+let next_button = create_youtube_button("next");
+next_button.onclick = next;
+
 let section = document.createElement("div");
 section.style.display = "none";
 
 let websites = [["genius.com", genius], ["lyrics.com/lyric", lyricscom]];
+
+let website_counter = 0;
+let submitted_query;
 
 let init_interval = setInterval(init, 250);
 
@@ -87,13 +96,34 @@ function watching_new_video() {
         return false;
     }
     previous_title = youtube_title;
+    submitted_query = youtube_title;
+
     return youtube_title;
 }
 
 function submit() {
     // Use query from text input to update the description.
     let new_query = input.value;
+    submitted_query = new_query;
     update_description(new_query);
+}
+
+function back() {
+    if (website_counter == 0) {
+        website_counter = websites.length - 1;
+    } else {
+        website_counter--;
+    }
+    single_update(submitted_query);
+}
+
+function next() {
+    if (website_counter == websites.length - 1) {
+        website_counter = 0
+    } else {
+        website_counter++;
+    }
+    single_update(submitted_query);
 }
 
 function toggle_display() {
@@ -119,8 +149,7 @@ async function url_to_dom(url) {
 
 async function search_duckduckgo(query, website) {
     // Return the href for the top genius result.
-
-    let url = "https://html.duckduckgo.com/html/?q=lyrics" + encodeURIComponent(" " + query + " site:" + website);
+    let url = "https://duckduckgo.com/html/?q=lyrics" + encodeURIComponent(" " + query + " site:" + website);
     let dom = await url_to_dom(url);
 
     let search_results = dom.getElementsByClassName("result__url");
@@ -133,21 +162,14 @@ async function search_duckduckgo(query, website) {
     return result;
 }
 
-async function update_description(title) {
+async function single_update(title) {
     let filtered_title = filter_title(title);
+    let website = websites[website_counter][WEBSITE];
+    let parser = websites[website_counter][PARSER];
+
     delete_previous_lyrics();
-    let i;
-    let top_result_url;
 
-    for (i = 0; i < websites.length; i++) {
-        let website = websites[i][WEBSITE];
-        song.innerText = "Checking " + website.split(".")[0] + "...\n";
-        top_result_url = await search_duckduckgo(filtered_title, website);
-        if (top_result_url) {
-            break;
-        }
-    }
-
+    let top_result_url = await search_duckduckgo(filtered_title, website);    
     if (!top_result_url) {
         song.innerText = "Couldn't find the lyrics.";
         return;
@@ -156,8 +178,27 @@ async function update_description(title) {
     song.innerText = filtered_title + "\n";
     source.innerText = top_result_url + "\n\n";
     source.href = top_result_url;
-    let lyrics = await websites[i][PARSER](top_result_url);
+
+    let lyrics = await parser(top_result_url);
+    if (!lyrics) {
+        song.innerText = "Couldn't parse lyrics."
+        return;
+    }
+
     lyrics_element.innerText = lyrics;
+
+    return lyrics;
+}
+
+async function update_description(title) {
+
+    for (website_counter = 0; website_counter < websites.length; website_counter++) {
+        if (await single_update(title)) {
+            return;
+        }
+    }
+
+    website_counter = 0;
 }
 
 function html_to_text(html) {
@@ -165,10 +206,12 @@ function html_to_text(html) {
 }
 
 async function genius(url) {
+    // Parse lyrics from a genius url.
+
     let dom = await url_to_dom(url);
     // Scrape some stuff from genius and put it into the description.
     let genius_song = dom.querySelector("meta[property='og:title']")
-                             .getAttribute("content");
+                         .getAttribute("content");
     song.innerText = genius_song + "\n";
     let lyrics = dom.querySelector("p").innerText;
     // Genius is sometimes changing the HTML.
@@ -211,9 +254,7 @@ function insert_lyrics_section() {
     // Elements persist even when you are clicking on a new video.
     // So instead of reloading the elements you can just manipulate them.
 
-    // Create a seperate space in the description for all new elements.
     let description = document.querySelector(".style-scope.ytd-video-secondary-info-renderer#description");
-    // Page didn't fully load yet.
     if (!description) {
         return false;
     }
@@ -223,7 +264,7 @@ function insert_lyrics_section() {
     new_div.appendChild(document.createElement("br"));
     new_div.appendChild(display_button);
     new_div.appendChild(section);
-    let all_elements = [document.createElement("br"), input, submit_button, 
+    let all_elements = [document.createElement("br"), input, submit_button, back_button, next_button,
                         document.createElement("br"), song, source, lyrics_element];
     for (i in all_elements) {
         section.appendChild(all_elements[i]);
@@ -237,7 +278,6 @@ function init() {
         return;
     }
     clearInterval(init_interval);
-    // Start main loop after initialization is done.
     setInterval(main, 250);
 }
 
